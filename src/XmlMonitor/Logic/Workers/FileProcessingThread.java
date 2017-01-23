@@ -1,5 +1,7 @@
 package XmlMonitor.Logic.Workers;
 
+import XmlMonitor.DatabaseEntities.XmlFilesEntriesEntity;
+import XmlMonitor.Logic.db.DatabaseManager;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -10,6 +12,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -68,9 +75,26 @@ public class FileProcessingThread implements Callable {
                 String department = head.getChildText("creationDate");
                 //System.out.println(filename + ": " + id+" - "+name+" - "+department);
                 resultset.add(_xmlFileName + ": " + id+" - "+name+" - "+department);
+
+                XmlFilesEntriesEntity databaseRecord = new XmlFilesEntriesEntity();
+                //databaseRecord.setId(1);
+                databaseRecord.setFilename(_xmlFileName.getFileName().toString());
+                databaseRecord.setEntryId(Integer.parseInt(id));
+                databaseRecord.setEntryContent(name);
+
+                LocalDateTime datetime = LocalDateTime.of(LocalDate.now(), LocalTime.now());
+
+                System.out.println(datetime.toString() + " / 2007-12-23 09:01:06.000000003 "
+                        + LocalDate.now() + " " + LocalTime.now());
+
+                Timestamp timestamp = Timestamp.valueOf(datetime);  //"2007-12-23 09:01:06.000000003");
+
+                databaseRecord.setEntryCreationDate(timestamp);
+                DatabaseManager.getInstance().saveEntity(databaseRecord);
             }
 
             //ResultFileWorker.getInstance().addRecord(_xmlFileName.getFileName().toString() + " - completed");
+
 
 
         } catch (JDOMException e) {
@@ -79,12 +103,14 @@ public class FileProcessingThread implements Callable {
             e.printStackTrace();
         }
 
-        try {
-            TimeUnit.SECONDS.sleep(20);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            TimeUnit.SECONDS.sleep(20);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+
         ResultFileWorker.getInstance().addRecord(_xmlFileName.getFileName().toString() + " - completed");
+
 
 
         //String result = _xmlFileName.getFileName().toString() + " - XXXXXX"; //resultset;

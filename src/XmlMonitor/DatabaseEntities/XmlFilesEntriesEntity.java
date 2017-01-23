@@ -1,5 +1,7 @@
 package XmlMonitor.DatabaseEntities;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 
@@ -17,6 +19,9 @@ public class XmlFilesEntriesEntity {
 
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    //@GenericGenerator(name="generator", strategy="increment")
+    //@GeneratedValue(generator="generator")
     public int getId() {
         return id;
     }

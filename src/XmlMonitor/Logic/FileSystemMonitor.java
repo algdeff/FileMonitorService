@@ -1,5 +1,6 @@
 package XmlMonitor.Logic;
 
+import XmlMonitor.Logic.db.DatabaseManager;
 import XmlMonitor.ServerStarter;
 import XmlMonitor.Logic.Workers.FileProcessingThread;
 
@@ -41,7 +42,6 @@ public class FileSystemMonitor {
 
             Thread directoryWalkingThread = new Thread(new DirecroryWalkingThread());
             directoryWalkingThread.start();
-
         }
 
     }
@@ -183,6 +183,9 @@ public class FileSystemMonitor {
             for (String entry : result) {
                 System.err.println(entry + " /---/ " + filePath);
             }
+
+            //DatabaseManager.getInstance().teste();
+            DatabaseManager.getInstance().test2();
 
             //ThreadPoolManager.getInstance().executeFutureTask(new FileProcessingThread(filePath));
         }
