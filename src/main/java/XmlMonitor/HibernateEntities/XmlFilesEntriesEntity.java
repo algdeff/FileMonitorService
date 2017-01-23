@@ -1,13 +1,8 @@
-package XmlMonitor.DatabaseEntities;
-
-import org.hibernate.annotations.GenericGenerator;
+package XmlMonitor.HibernateEntities;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
-/**
- * Created by DeFF on 22.01.2017.
- */
 @Entity
 @Table(name = "xml_files_entries", schema = "org", catalog = "")
 public class XmlFilesEntriesEntity {

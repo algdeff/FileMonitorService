@@ -18,8 +18,8 @@
         <property name="hibernate.c3p0.max_statements">50</property>
         <property name="hibernate.c3p0.idle_test_period">3000</property>
 
-        <mapping resource="XmlMonitor/DatabaseEntities/XmlFilesEntriesEntity.hbm.xml"/>
-        <mapping class="XmlMonitor.DatabaseEntities.XmlFilesEntriesEntity"/>
+        <mapping resource="HibernateMapping/XmlFilesEntriesEntity.hbm.xml"/>
+        <mapping class="XmlMonitor.HibernateEntities.XmlFilesEntriesEntity"/>
         <!-- <property name="connection.username"/> -->
         <!-- <property name="connection.password"/> -->
 

@@ -4,7 +4,7 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
 
-    <class name="XmlMonitor.DatabaseEntities.XmlFilesEntriesEntity" table="xml_files_entries" schema="org">
+    <class name="XmlMonitor.HibernateEntities.XmlFilesEntriesEntity" table="xml_files_entries" schema="org">
         <id name="id">
             <column name="id" sql-type="int(11)"/>
         </id>

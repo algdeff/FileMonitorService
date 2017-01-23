@@ -1,6 +1,6 @@
 package XmlMonitor.Logic.Workers;
 
-import XmlMonitor.DatabaseEntities.XmlFilesEntriesEntity;
+import XmlMonitor.HibernateEntities.XmlFilesEntriesEntity;
 import XmlMonitor.Logic.db.DatabaseManager;
 import org.jdom2.Document;
 import org.jdom2.Element;

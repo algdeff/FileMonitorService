@@ -9,8 +9,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.jboss.netty.logging.InternalLoggerFactory;
-import org.jboss.netty.logging.Slf4JLoggerFactory;
+//import org.jboss.netty.logging.InternalLoggerFactory;
+//import org.jboss.netty.logging.Slf4JLoggerFactory;
 
 public class ServerStarter {
 
@@ -41,7 +41,7 @@ public class ServerStarter {
 
     public static void main(String[] args) {
 
-        InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
+        //InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 
         try {
             _instance = new ServerStarter();
