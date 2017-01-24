@@ -10,13 +10,20 @@
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password">deff</property>
         <property name="hibernate.current_session_context_class">thread</property>
-
+        <property name="hibernate.show_sql">false</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
         <property name="hibernate.c3p0.min_size">5</property>
         <property name="hibernate.c3p0.max_size">20</property>
-        <property name="hibernate.c3p0.timeout">300</property>
+        <property name="hibernate.c3p0.timeout">600</property>
         <property name="hibernate.c3p0.max_statements">50</property>
         <property name="hibernate.c3p0.idle_test_period">3000</property>
+
+        <!--<property name="hibernate.connection.autocommit">false</property>-->
+        <!--<property name="hibernate.cache.provider_class">org.hibernate.cache.internal.StandardQueryCacheFactory</property>-->
+        <!--<property name="hibernate.connection.requireSSL">false</property>-->
+        <!--<property name="hibernate.connection.is-connection-validation-required">true&useSSL=false</property>-->
+        <!--<property name="oracle.net.ssl_client_authentication">false</property>-->
+        <property name="hibernate.connection.provider_class">org.hibernate.c3p0.internal.C3P0ConnectionProvider</property>
 
         <mapping resource="HibernateMapping/XmlFilesEntriesEntity.hbm.xml"/>
         <mapping class="XmlMonitor.HibernateEntities.XmlFilesEntriesEntity"/>

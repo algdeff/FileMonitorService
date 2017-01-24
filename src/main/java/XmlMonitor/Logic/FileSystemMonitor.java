@@ -3,6 +3,7 @@ package XmlMonitor.Logic;
 import XmlMonitor.Logic.db.DatabaseManager;
 import XmlMonitor.ServerStarter;
 import XmlMonitor.Logic.Workers.FileProcessingThread;
+import XmlMonitor.Utils.XmlUtil;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -12,15 +13,26 @@ import java.util.concurrent.*;
 public class FileSystemMonitor {
 
     private Path _monitoringPath;
+    private Path _processedPath;
+    private Path _incorrectPath;
 
     public FileSystemMonitor() {
     }
 
     public void start() {
 
-        _monitoringPath = ConfigManager.getInstance().getInputFolder();
+        _monitoringPath = ConfigManager.getInstance().getMonitoringPath();
+        _processedPath = ConfigManager.getInstance().getProcessedFilesPath();
+        _incorrectPath = ConfigManager.getInstance().getIncorrectFilesPath();
+
+//        XmlUtil xul = new XmlUtil();
+//        for (int i=0; i<1000; i++) {
+//            xul.createXMLDocument("entry0"+ i +".xml");
+//        }
 
         int pollingInterval = ConfigManager.getInstance().getDirectoryPollingInterval();
+
+        prepareWorkFolders();
 
         if (pollingInterval > 0) {
 
@@ -42,6 +54,22 @@ public class FileSystemMonitor {
 
             Thread directoryWalkingThread = new Thread(new DirecroryWalkingThread());
             directoryWalkingThread.start();
+        }
+
+    }
+
+    private void prepareWorkFolders() {
+
+        try {
+            Files.createDirectories(_monitoringPath);
+            Files.createDirectories(_processedPath);
+            Files.createDirectories(_incorrectPath);
+        } catch (FileAlreadyExistsException faee) {
+            System.err.println("Please rename this files: "
+                    + _monitoringPath + ", " + _processedPath + " or " + _incorrectPath);
+            ServerStarter.stopAndExit(1);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
 
     }
@@ -108,7 +136,7 @@ public class FileSystemMonitor {
             }
         }
 
-        private void startWatcher() throws NullPointerException {
+        private void startWatcher() throws Exception {
             Path watchDirectory = _monitoringPath;
             WatchService watchService = null;
 
@@ -170,24 +198,25 @@ public class FileSystemMonitor {
 //            } catch (InterruptedException ie) {
 //                ie.printStackTrace();
 //            }
-            Future<ArrayList> future = ThreadPoolManager.getInstance().getCompletionFutureTask();
-            ArrayList<String> result = new ArrayList<>();
-            try {
-                result = future.get();
-            } catch (InterruptedException ie) {
-                ie.printStackTrace();
-            } catch (ExecutionException ee) {
-                ee.printStackTrace();
-            }
+            //===================================================//
+//            Future<ArrayList> future = ThreadPoolManager.getInstance().getCompletionFutureTask();
+//            ArrayList<String> result = new ArrayList<>();
+//            try {
+//                result = future.get();
+//            } catch (InterruptedException ie) {
+//                ie.printStackTrace();
+//            } catch (ExecutionException ee) {
+//                ee.printStackTrace();
+//            }
+//
+//            for (String entry : result) {
+//                System.err.println(entry + " /---/ " + filePath);
+//            }
+//
+//            //DatabaseManager.getInstance().teste();
+//            DatabaseManager.getInstance().test2();
 
-            for (String entry : result) {
-                System.err.println(entry + " /---/ " + filePath);
-            }
-
-            //DatabaseManager.getInstance().teste();
-            DatabaseManager.getInstance().test2();
-
-            //ThreadPoolManager.getInstance().executeFutureTask(new FileProcessingThread(filePath));
+            ThreadPoolManager.getInstance().executeFutureTask(new FileProcessingThread(filePath));
         }
 
     }
