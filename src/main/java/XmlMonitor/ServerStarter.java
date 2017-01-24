@@ -5,36 +5,13 @@ import XmlMonitor.Logic.ThreadPoolManager;
 import XmlMonitor.Logic.FileSystemMonitor;
 import XmlMonitor.Logic.Workers.ResultFileWorker;
 import XmlMonitor.Logic.db.DatabaseManager;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-//import org.jboss.netty.logging.InternalLoggerFactory;
-//import org.jboss.netty.logging.Slf4JLoggerFactory;
 
 public class ServerStarter {
-
-//    private static final SessionFactory SESSION_FACTORY;
-//
-//    static {
-//        try {
-//            Configuration configuration = new Configuration();
-//            configuration.configure();
-//
-//            SESSION_FACTORY = configuration.buildSessionFactory();
-//        } catch (Throwable ex) {
-//            throw new ExceptionInInitializerError(ex);
-//        }
-//    }
 
     private static String _serverName = "XmlMonitorService";
     private static ServerStarter _instance;
 
     private FileSystemMonitor _fileSystemMonitor;
-//
-//    public Session getSession() throws HibernateException {
-//        return SESSION_FACTORY.openSession();
-//    }
 
     private ServerStarter() {
     }
@@ -53,16 +30,12 @@ public class ServerStarter {
             stopServerInstance();
         }
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                //_timer.cancel();
-                stopServerInstance();
-
-                //LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-                //lc.stop();
-            }
-        });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            //_timer.cancel();
+            stopServerInstance();
+            //LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+            //lc.stop();
+        }));
     }
 
 
@@ -70,16 +43,15 @@ public class ServerStarter {
 
         Facade.getInstance().init();
         ConfigManager.getInstance().init();
-        ResultFileWorker.getInstance().init();
-
         DatabaseManager.getInstance().init();
-
         ThreadPoolManager.getInstance()
                 .init(ConfigManager.getInstance()
                 .getThreadPoolSize());
 
         _fileSystemMonitor = new FileSystemMonitor();
         _fileSystemMonitor.start();
+
+        ResultFileWorker.getInstance().init();
 
     }
 
@@ -115,5 +87,4 @@ public class ServerStarter {
     public static String getServerName() {
         return _serverName;
     }
-
 }

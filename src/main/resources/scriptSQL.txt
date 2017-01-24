@@ -1,0 +1,7 @@
+CREATE TABLE `autopark`.`xml_files_entries` (
+  `id` INT NOT NULL AUTO_INCREMENT, 
+  `filename` VARCHAR(100) NOT NULL,
+  `entry_id` INT NULL,
+  `entry_content` VARCHAR(1000) NULL,
+  `entry_creation_date` DATETIME NULL,
+  PRIMARY KEY (`id`));

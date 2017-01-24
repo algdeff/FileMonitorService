@@ -19,10 +19,10 @@ public final class ConfigManager {
      ConfigManager
 
      Property keys from config file
-     default: server.conf.xml
+     default: xmlmonitor.conf.xml
      */
 
-    private static final String CONFIG_FILE_PATH =              "config/server.conf.xml";
+    private static final String CONFIG_FILE_PATH =              "xmlmonitor.conf.xml";
 
     private static final String INPUT_PATH =                    "monitoring_path";
     private static final String OUTPUT_PATH =                   "processed_files_path";
@@ -46,7 +46,11 @@ public final class ConfigManager {
 
     public static synchronized ConfigManager getInstance() {
         if (_instance == null) {
-            _instance = new ConfigManager();
+            synchronized (ConfigManager.class) {
+                if (_instance == null) {
+                    _instance = new ConfigManager();
+                }
+            }
         }
         return _instance;
     }
@@ -60,10 +64,6 @@ public final class ConfigManager {
         try {
             FileBasedConfigurationBuilder<XMLConfiguration> builder = configs.xmlBuilder(CONFIG_FILE_PATH);
             XMLConfiguration config = builder.getConfiguration();
-//            config.addProperty("input_folder_path", "newValue");
-//            config.addProperty("output_folder_path", "newValue222");
-//            builder.save();
-
             Iterator<String> iterator = config.getKeys();
             while (iterator.hasNext()) {
                 String propertyName = iterator.next();
@@ -71,8 +71,8 @@ public final class ConfigManager {
                 _properties.put(propertyName, config.getString(propertyName));
             }
 
-        } catch (ConfigurationException cex) {
-            // Something went wrong
+        } catch (Exception cex) {
+            System.err.println("Correct config file not found: " + CONFIG_FILE_PATH);
         }
 
         _inited = true;

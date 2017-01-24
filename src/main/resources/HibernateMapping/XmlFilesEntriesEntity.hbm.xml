@@ -9,16 +9,16 @@
             <column name="id" sql-type="int(11)"/>
         </id>
         <property name="filename">
-            <column name="filename" sql-type="varchar(100)" length="100"/>
+            <column name="filename" sql-type="varchar(100)" length="100" not-null="true"/>
         </property>
         <property name="entryId">
-            <column name="entry_id" sql-type="int(11)" not-null="true"/>
+            <column name="entry_id" sql-type="int(11)" not-null="false"/>
         </property>
         <property name="entryContent">
-            <column name="entry_content" sql-type="varchar(1000)" length="1000" not-null="true"/>
+            <column name="entry_content" sql-type="varchar(1000)" length="1000" not-null="false"/>
         </property>
         <property name="entryCreationDate">
-            <column name="entry_creation_date" sql-type="datetime" not-null="true"/>
+            <column name="entry_creation_date" sql-type="datetime" not-null="false"/>
         </property>
     </class>
 </hibernate-mapping>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?><configuration>
+    <!--путь входящей папки для мониторинга и обработки-->
+    <monitoring_path>_monitoring_folder</monitoring_path>
+    <!--путь папки с корректно обработанными файлами-->
+    <processed_files_path>_processedFiles</processed_files_path>
+    <!--путь папки с файлами которые не удалось обработать-->
+    <incorrect_files_path>_wrongFiles</incorrect_files_path>
+    <!--путь и имя файла с данными завершенных операций-->
+    <result_file_path_name>./result.txt</result_file_path_name>
+    <!--интервал проверки директории на поступление новых файлов для обработки, сек.
+    0 - постоянное отслеживание изменений-->
+    <directory_polling_interval>0</directory_polling_interval>
+    <!--количество потоков для параллельных вычислений-->
+    <thread_pool_size>50</thread_pool_size>
+    <!--маски обрабатываемых файлов-->
+    <target_file_type_glob>*.{xml}</target_file_type_glob>
+    <!--название секции записи и входящих в нее полей-->
+    <entry_name>Entry</entry_name>
+    <entry_content>content</entry_content>
+    <entry_date>creationDate</entry_date>
+</configuration>

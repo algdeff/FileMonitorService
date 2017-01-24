@@ -23,7 +23,6 @@ public final class Publisher {
 
     }
 
-
     public static Publisher getInstance() {
         if (instance == null) {
             synchronized (Publisher.class) {
@@ -46,15 +45,6 @@ public final class Publisher {
         }
         ListenerContext context = new ListenerContext(listener, group_name);
         _listeners.put(listenerName, context);
-
-//        for (String eventName : context.getListenerInterests()) {
-//            List<String> listeners = _listenersEventMap.get(eventName);
-//            if (listeners == null) {
-//                listeners = new ArrayList<>();
-//                _listenersEventMap.put(eventName, listeners);
-//            }
-//            listeners.add(listenerName);
-//        }
         updateListenersEventMap();
 
         return true;
@@ -132,13 +122,11 @@ public final class Publisher {
 
     }
 
-
     public Boolean isRegistered(IListener listener) {
         return _listeners.containsKey(listener.toString());
     }
     public Boolean isRegistered(String eventName) {
         return _listenersEventMap.containsKey(eventName);
-
 //        for (ListenerContext context : _listeners.values()) {
 //            for (String interestName : context.getListenerInterests()) {
 //                if (interestName.equals(eventName)) {

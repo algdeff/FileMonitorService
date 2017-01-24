@@ -1,13 +1,22 @@
 package XmlMonitor.Logic.Workers;
 
+import XmlMonitor.Logic.ConfigManager;
+import XmlMonitor.Logic.ThreadPoolManager;
+import XmlMonitor.ServerStarter;
+
+import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class ResultFileWorker {
 
     private static ConcurrentLinkedQueue<String> _queue;
+
+    private Path _resultFilePath;
 
     private int counter;
 
@@ -17,17 +26,27 @@ public class ResultFileWorker {
         private static final ResultFileWorker INSTANCE = new ResultFileWorker();
     }
 
-    public ResultFileWorker() {
+    private ResultFileWorker() {
     }
 
     public static ResultFileWorker getInstance() {
         return SingletonInstance.INSTANCE;
     }
 
+
+
     public void init() {
         if (_inited) {
             return;
         }
+
+        _resultFilePath = ConfigManager.getInstance().getResultFilePath();
+
+        prepareResultFile();
+
+        logRecords();
+
+
 //        _threadsNumber = threadsNumber;
 //        _queue = new LinkedList();
 //        _threads = new ThreadPoolManager.PoolWorker[threadsNumber];
@@ -64,6 +83,53 @@ public class ResultFileWorker {
 //        System.err.println(result + " / " + tasksQueueSize);
 //
 //    }
+
+    private void prepareResultFile() {
+
+        if (Files.exists(_resultFilePath)) return;
+
+        try {
+
+            Files.createFile(_resultFilePath);
+
+            //Files.ex
+        } catch (FileAlreadyExistsException faee) {
+            System.err.println("Please rename this file: " + _resultFilePath);
+            ServerStarter.stopAndExit(1);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+    }
+
+    private void logRecords() {
+        //ArrayList<String> result = new ArrayList<>();
+
+        System.err.println("logRecords START");
+
+        while (true) {
+
+            ArrayList<String> result = new ArrayList<>();
+
+            Future<ArrayList> future = ThreadPoolManager.getInstance().getCompletionFutureTask();
+
+            System.err.println("logRecords cycle");
+
+            try {
+                result = future.get();
+            } catch (InterruptedException ie) {
+                ie.printStackTrace();
+            } catch (ExecutionException ee) {
+                ee.printStackTrace();
+            }
+
+            for (String entry : result) {
+                System.err.println(entry + " /---/ ");
+            }
+
+        }
+
+    }
 
     public void addRecord(String record) {
         counter++;

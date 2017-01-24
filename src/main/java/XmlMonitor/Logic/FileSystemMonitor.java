@@ -25,12 +25,7 @@ public class FileSystemMonitor {
         _processedPath = ConfigManager.getInstance().getProcessedFilesPath();
         _incorrectPath = ConfigManager.getInstance().getIncorrectFilesPath();
 
-//        XmlUtil xul = new XmlUtil();
-//        for (int i=0; i<1000; i++) {
-//            xul.createXMLDocument("entry0"+ i +".xml");
-//        }
-
-        int pollingInterval = ConfigManager.getInstance().getDirectoryPollingInterval();
+        int pollingInterval = 0; //ConfigManager.getInstance().getDirectoryPollingInterval();
 
         prepareWorkFolders();
 
@@ -39,13 +34,10 @@ public class FileSystemMonitor {
             Thread directoryWalkingThread = new Thread(new DirecroryWalkingThread());
             directoryWalkingThread.start();
 
-            ThreadPoolManager.getInstance().sheduledTask(new Runnable() {
-                @Override
-                public void run() {
-                    System.err.println(pollingInterval + _monitoringPath.toString() + directoryWalkingThread.isAlive());
+            ThreadPoolManager.getInstance().sheduledTask(() -> {
+                System.err.println(pollingInterval + _monitoringPath.toString() + directoryWalkingThread.isAlive());
 
-                    //directoryWalking(monitoringPath);
-                }
+                //directoryWalking(monitoringPath);
             }, pollingInterval);
         } else {
             Thread directoryWatcherThread = new Thread(new DirectoryWatcherThread());
@@ -75,10 +67,6 @@ public class FileSystemMonitor {
     }
 
     private boolean isCorrectFile(Path pathname) {
-        System.out.println(Files.isSymbolicLink(pathname)
-                + " " + Files.isWritable(pathname)
-                + " " + Files.isDirectory(pathname));
-
         if (Files.isSymbolicLink(pathname)
                 || !Files.isWritable(pathname)
                 || Files.isDirectory(pathname)) return false;
@@ -101,13 +89,12 @@ public class FileSystemMonitor {
                 e.printStackTrace();
             }
 
-
         }
 
         private void directoryWalking() throws Exception {
 
             try {
-                //Path filename = Files.walkFileTree(pathName, new FindFileVisitor(pattern));
+                //Path filename = Files.walkFileTree(pathName, new FindFileVisitor(SEARCH_GLOB));
                 DirectoryStream<Path> directoryStream = Files.newDirectoryStream(_monitoringPath, ConfigManager
                         .getInstance().getTargetFileTypeGlob());
                 for (Path file : directoryStream) {
@@ -158,8 +145,7 @@ public class FileSystemMonitor {
 
                 for (WatchEvent event : key.pollEvents()) {
                     if (event.context() == null) {
-                        System.err.println("ERROR______________________________________");
-
+                        System.err.println("Some files in progress..");
                         continue;
                     }
                     fileProcessing(Paths.get(watchDirectory.toString() , event.context().toString()));
@@ -171,51 +157,6 @@ public class FileSystemMonitor {
 
         private void fileProcessing(Path filePath) {
             if (!isCorrectFile(filePath)) return;
-
-            System.out.println("Add new file: " + filePath);
-
-//            FileProcessingThread callable = new FileProcessingThread(filePath);
-//            FutureTask task = new FutureTask(callable);
-//            Thread t = new Thread(task);
-//            t.start();
-//
-//            try {
-//                System.out.println(task.isDone());
-//                System.out.println(task.get());
-//            } catch(ExecutionException ee) {
-//                ee.printStackTrace();
-//            } catch (InterruptedException ie) {
-//                ie.printStackTrace();
-//            }
-
-//            String result = "";
-//            try {
-//                Future task = ThreadPoolManager.getInstance().getFutureTaskFromQueue();
-//                result = (String) task.get();
-//
-//            } catch(ExecutionException ee) {
-//                ee.printStackTrace();
-//            } catch (InterruptedException ie) {
-//                ie.printStackTrace();
-//            }
-            //===================================================//
-//            Future<ArrayList> future = ThreadPoolManager.getInstance().getCompletionFutureTask();
-//            ArrayList<String> result = new ArrayList<>();
-//            try {
-//                result = future.get();
-//            } catch (InterruptedException ie) {
-//                ie.printStackTrace();
-//            } catch (ExecutionException ee) {
-//                ee.printStackTrace();
-//            }
-//
-//            for (String entry : result) {
-//                System.err.println(entry + " /---/ " + filePath);
-//            }
-//
-//            //DatabaseManager.getInstance().teste();
-//            DatabaseManager.getInstance().test2();
-
             ThreadPoolManager.getInstance().executeFutureTask(new FileProcessingThread(filePath));
         }
 

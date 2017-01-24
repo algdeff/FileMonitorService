@@ -43,6 +43,7 @@ public class FileProcessingThread implements Callable {
         boolean isProcessed = false;
         ArrayList<String> resultset = new ArrayList<>();
         Document xmlDoc;
+        Timestamp timestamp;
 
         String entryName = ConfigManager.getInstance().getEntryName();
         String entityContent = ConfigManager.getInstance().getEntryContent();
@@ -61,31 +62,27 @@ public class FileProcessingThread implements Callable {
                 String id = entry.getAttributeValue("id");
                 String content = entry.getChildText(entityContent);
                 String date = entry.getChildText(entryDate);
-                resultset.add(_xmlFileName + ": " + id+" - "+content+" - "+date);
 
                 XmlFilesEntriesEntity databaseRecord = new XmlFilesEntriesEntity();
                 databaseRecord.setFilename(_xmlFileName.getFileName().toString());
-                databaseRecord.setEntryId(Integer.parseInt(id));
+                databaseRecord.setEntryId(id != null ? Integer.parseInt(id) : null);
                 databaseRecord.setEntryContent(content);
 
-                LocalDateTime datetime = LocalDateTime.of(LocalDate.now(), LocalTime.now());
-
-//                System.out.println(datetime.toString() + " / 2007-12-23 09:01:06.000000003 "
-//                        + LocalDate.now() + " " + LocalTime.now());
-
-                Timestamp timestamp = Timestamp.valueOf(date);  //"2007-12-23 09:01:06.000000003");
-
-                System.out.println(timestamp.toString());
-
+                try {
+                    timestamp = Timestamp.valueOf(date);
+                } catch (IllegalArgumentException iae) {
+                    System.err.println("Incorrect DATE format in: " + _xmlFileName.toString());
+                    timestamp = null;
+                }
                 databaseRecord.setEntryCreationDate(timestamp);
                 DatabaseManager.getInstance().saveEntity(databaseRecord);
+                resultset.add(_xmlFileName.getFileName() + ": " + id + " - "
+                        + " - " + timestamp + " --- entry add to database");
             }
             isProcessed = elements.size() > 0;
 
         } catch (JDOMException jde) {
             jde.printStackTrace();
-        } catch (IllegalArgumentException iae) {
-            System.err.println("Wrong DATE format in: " + _xmlFileName.toString());
         } catch (IOException ioe) {
             System.err.println("File not read: " + _xmlFileName.toString());
         } catch (Exception e) {
@@ -93,13 +90,14 @@ public class FileProcessingThread implements Callable {
         }
         moveFile(isProcessed);
 
+        System.err.println("file removed: " + _xmlFileName.toString());
+
 //        try {
 //            TimeUnit.SECONDS.sleep(20);
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
 
-        //ResultFileWorker.getInstance().addRecord(_xmlFileName.getFileName().toString() + " - completed");
         return resultset;
     }
 
