@@ -7,13 +7,9 @@ import org.hibernate.*;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.query.Query;
 
-import javax.persistence.metamodel.EntityType;
-import javax.persistence.metamodel.Metamodel;
-
-import java.util.ArrayList;
+import java.io.File;
 import java.util.List;
 
 
@@ -25,12 +21,15 @@ public final class DatabaseManager implements IListener{
     private static final ThreadLocal<Session> THREAD_LOCAL = new ThreadLocal<>();
     private static SessionFactory sessionFactory;
 
-    private static final StandardServiceRegistry registry = new StandardServiceRegistryBuilder().configure().build();
+    private static final StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
+            .configure(new File("hibernate.cfg.xml")).build();
 
     static {
         try {
 //            configuration.configure(CONFIG_FILE_LOCATION);
 //            sessionFactory = configuration.buildSessionFactory();
+            //sessionFactory = cfg.configure(new File("hibernate.cfg.xml")).buildSessionFactory();
+
             MetadataSources metadataSources = new MetadataSources(registry);
             sessionFactory = metadataSources.buildMetadata().buildSessionFactory();
 
@@ -94,7 +93,6 @@ public final class DatabaseManager implements IListener{
         if (_init) return;
 
         registerOnPublisher();
-
         _init = true;
     }
 

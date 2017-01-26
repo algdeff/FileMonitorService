@@ -5,6 +5,7 @@ import XmlMonitor.ServerStarter;
 import XmlMonitor.Logic.Workers.FileProcessingThread;
 import XmlMonitor.Utils.XmlUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -21,11 +22,11 @@ public class FileSystemMonitor {
 
     public void start() {
 
-        _monitoringPath = ConfigManager.getInstance().getMonitoringPath();
-        _processedPath = ConfigManager.getInstance().getProcessedFilesPath();
-        _incorrectPath = ConfigManager.getInstance().getIncorrectFilesPath();
+        _monitoringPath = ConfigManager.getMonitoringPath();
+        _processedPath = ConfigManager.getProcessedFilesPath();
+        _incorrectPath = ConfigManager.getIncorrectFilesPath();
 
-        int pollingInterval = 0; //ConfigManager.getInstance().getDirectoryPollingInterval();
+        int pollingInterval = ConfigManager.getDirectoryPollingInterval();
 
         prepareWorkFolders();
 
@@ -73,7 +74,7 @@ public class FileSystemMonitor {
 
         PathMatcher pathMatcher = FileSystems.getDefault()
                 .getPathMatcher("glob:" + ConfigManager
-                        .getInstance().getTargetFileTypeGlob());
+                        .getTargetFileTypeGlob());
 
         return pathMatcher.matches(pathname.getFileName());
     }
@@ -96,9 +97,10 @@ public class FileSystemMonitor {
             try {
                 //Path filename = Files.walkFileTree(pathName, new FindFileVisitor(SEARCH_GLOB));
                 DirectoryStream<Path> directoryStream = Files.newDirectoryStream(_monitoringPath, ConfigManager
-                        .getInstance().getTargetFileTypeGlob());
+                        .getTargetFileTypeGlob());
                 for (Path file : directoryStream) {
-                    if (Files.isDirectory(file)) continue;
+                    //if (Files.isDirectory(file)) continue;
+                    if (!isCorrectFile(file)) continue;
                     ThreadPoolManager.getInstance().executeFutureTask(new FileProcessingThread(file));
                 }
 

@@ -3,7 +3,7 @@ package XmlMonitor;
 import XmlMonitor.Logic.ConfigManager;
 import XmlMonitor.Logic.ThreadPoolManager;
 import XmlMonitor.Logic.FileSystemMonitor;
-import XmlMonitor.Logic.Workers.ResultFileWorker;
+import XmlMonitor.Logic.Workers.LogFileWorker;
 import XmlMonitor.Logic.db.DatabaseManager;
 
 public class ServerStarter {
@@ -24,7 +24,7 @@ public class ServerStarter {
             _instance = new ServerStarter();
             _instance.start();
 
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             //ConsoleUtils.tprintf("Failed start server: %s", ex.getMessage());
             ex.printStackTrace(System.err);
             stopServerInstance();
@@ -42,33 +42,23 @@ public class ServerStarter {
     private void start() {
 
         Facade.getInstance().init();
-        ConfigManager.getInstance().init();
+        ConfigManager.init();
         DatabaseManager.getInstance().init();
         ThreadPoolManager.getInstance()
-                .init(ConfigManager.getInstance()
-                .getThreadPoolSize());
+                .init(ConfigManager.getThreadPoolSize());
 
         _fileSystemMonitor = new FileSystemMonitor();
         _fileSystemMonitor.start();
 
-        ResultFileWorker.getInstance().init();
-
+        LogFileWorker.getInstance().init();
     }
 
     private void stop() {
 
-        System.out.println("Server STOP");
-
-//        GameEventManager.getInstance().shutdown();
-//        AssetManager.getInstance().stopScheduling();
-//        GlobalCounters.shutdown();
-//        SessionManager.getInstance().shutdown();
-//        GroupManager.getInstance().shutdown();
-//        LeaderMap.getInstance().shutdown();
-//        RestFacade.shutdown();
-//        StatisticDB.reset();
-//        DBConnectionPool.closeAll();
-
+        System.err.println("Server STOP");
+//        ThreadPoolManager.reset();
+//        Facade.shutdown();
+//        DatabaseManager.closeAll();
     }
 
     private static void stopServerInstance() {

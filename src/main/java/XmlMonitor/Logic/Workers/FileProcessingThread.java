@@ -11,10 +11,7 @@ import org.jdom2.input.SAXBuilder;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -36,18 +33,30 @@ public class FileProcessingThread implements Callable {
 
     @Override
     public ArrayList call() {
-        return readXMLDocument();
+        return processedXMLDocument();
     }
 
-    private ArrayList readXMLDocument() {
-        boolean isProcessed = false;
+    private ArrayList processedXMLDocument() {
         ArrayList<String> resultset = new ArrayList<>();
+
+//        Path processedFile = Paths.get(ConfigManager.getProcessedFilesPath().toString(),
+//                _xmlFileName.getFileName().toString());
+//
+//        if (Files.exists(processedFile)) {
+//            String message = "File: " + _xmlFileName.getFileName().toString()
+//                    + " already exist in processed folder!";
+//            resultset.add(message);
+//            System.err.println(message);
+//            return resultset;
+//        }
+
+        boolean isProcessed = false;
         Document xmlDoc;
         Timestamp timestamp;
 
-        String entryName = ConfigManager.getInstance().getEntryName();
-        String entityContent = ConfigManager.getInstance().getEntryContent();
-        String entryDate = ConfigManager.getInstance().getEntryDate();
+        String entryName = ConfigManager.getEntryName();
+        String entityContent = ConfigManager.getEntryContent();
+        String entryDate = ConfigManager.getEntryDate();
 
         SAXBuilder parser = new SAXBuilder();
         try {
@@ -71,13 +80,14 @@ public class FileProcessingThread implements Callable {
                 try {
                     timestamp = Timestamp.valueOf(date);
                 } catch (IllegalArgumentException iae) {
-                    System.err.println("Incorrect DATE format in: " + _xmlFileName.toString());
+                    System.err.println("Incorrect DATE format in entry: "
+                            + id + ", file: " + _xmlFileName.getFileName().toString());
                     timestamp = null;
                 }
                 databaseRecord.setEntryCreationDate(timestamp);
                 DatabaseManager.getInstance().saveEntity(databaseRecord);
                 resultset.add(_xmlFileName.getFileName() + ": " + id + " - "
-                        + " - " + timestamp + " --- entry add to database");
+                        + timestamp + " --- entry add to database");
             }
             isProcessed = elements.size() > 0;
 
@@ -103,15 +113,18 @@ public class FileProcessingThread implements Callable {
 
     private void moveFile(boolean isProcessed) {
 
-        Path target = isProcessed ? Paths.get(ConfigManager.getInstance().getProcessedFilesPath().toString(),
+        Path target = isProcessed ? Paths.get(ConfigManager.getProcessedFilesPath().toString(),
                 _xmlFileName.getFileName().toString()) :
-                Paths.get(ConfigManager.getInstance().getIncorrectFilesPath().toString(),
+                Paths.get(ConfigManager.getIncorrectFilesPath().toString(),
                         _xmlFileName.getFileName().toString());
 
         try {
-            Files.move(_xmlFileName, target);
-        } catch (IOException e) {
-            e.printStackTrace();
+            Files.move(_xmlFileName, target, StandardCopyOption.REPLACE_EXISTING);
+        } catch (FileSystemException fse) {
+            System.out.println("File: " + _xmlFileName.getFileName().
+                    toString() + " is already used!");
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
 
     }

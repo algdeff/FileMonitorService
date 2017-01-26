@@ -4,17 +4,21 @@ public final class Facade {
 
     public static final String EVENT_CREATE_ENTRY = "created_new_file";
 
-    private static volatile Facade instance;
+    private static volatile Facade _instance;
     private static boolean _inited = false;
 
     private Facade() {
     }
 
-    public static synchronized Facade getInstance() {
-        if (instance == null) {
-            instance = new Facade();
+    public static Facade getInstance() {
+        if (_instance == null) {
+            synchronized (Facade.class) {
+                if (_instance == null) {
+                    _instance = new Facade();
+                }
+            }
         }
-        return instance;
+        return _instance;
     }
 
     void init() {

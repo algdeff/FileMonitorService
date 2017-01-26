@@ -1,17 +1,14 @@
 package XmlMonitor.Logic;
 
+import XmlMonitor.ServerStarter;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
-import org.apache.commons.configuration2.ex.ConfigurationException;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public final class ConfigManager {
 
@@ -27,7 +24,7 @@ public final class ConfigManager {
     private static final String INPUT_PATH =                    "monitoring_path";
     private static final String OUTPUT_PATH =                   "processed_files_path";
     private static final String INCORRECT_PATH =                "incorrect_files_path";
-    private static final String RESULT_FILE =                   "result_file_path_name";
+    private static final String LOG_FILE_PATH =                 "log_file_path_name";
     private static final String DIRECTORY_POLLING_INTERVAL =    "directory_polling_interval";
     private static final String THREAD_POOL_SIZE =              "thread_pool_size";
     private static final String TARGET_FILE_TYPE_GLOB =         "target_file_type_glob";
@@ -35,86 +32,78 @@ public final class ConfigManager {
     private static final String ENTRY_CONTENT =                 "entry_content";
     private static final String ENTRY_DATE =                    "entry_date";
 
-    private static volatile ConfigManager _instance;
-    private static boolean _inited = false;
+    private static final ConcurrentHashMap<String, String> _properties; // = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<String, String> _properties;
-
-    private ConfigManager() {
-        _properties = new ConcurrentHashMap<>();
-    }
-
-    public static synchronized ConfigManager getInstance() {
-        if (_instance == null) {
-            synchronized (ConfigManager.class) {
-                if (_instance == null) {
-                    _instance = new ConfigManager();
-                }
-            }
-        }
-        return _instance;
-    }
-
-    public void init() {
-        if (_inited) {
-            return;
-        }
-
+    static {
         Configurations configs = new Configurations();
+        _properties = new ConcurrentHashMap<>();
         try {
             FileBasedConfigurationBuilder<XMLConfiguration> builder = configs.xmlBuilder(CONFIG_FILE_PATH);
             XMLConfiguration config = builder.getConfiguration();
             Iterator<String> iterator = config.getKeys();
             while (iterator.hasNext()) {
                 String propertyName = iterator.next();
-                System.out.println(propertyName + " = " + config.getString(propertyName));
+                System.err.println(propertyName + ": " + config.getString(propertyName));
                 _properties.put(propertyName, config.getString(propertyName));
             }
 
         } catch (Exception cex) {
             System.err.println("Correct config file not found: " + CONFIG_FILE_PATH);
+            ServerStarter.stopAndExit(1);
         }
-
-        _inited = true;
     }
 
-    public Path getMonitoringPath() {
+//    private static class SingletonInstance {
+//        private static final ConfigManager INSTANCE = new ConfigManager();
+//    }
+
+    private ConfigManager() {
+    }
+
+//    public static ConfigManager getInstance() {
+//        return SingletonInstance.INSTANCE;
+//    }
+
+    public static void init() {
+    }
+
+    public static Path getMonitoringPath() {
         return Paths.get(_properties.get(INPUT_PATH));
     }
 
-    public Path getProcessedFilesPath() {
+    public static Path getProcessedFilesPath() {
         return Paths.get(_properties.get(OUTPUT_PATH));
     }
 
-    public Path getIncorrectFilesPath() {
+    public static Path getIncorrectFilesPath() {
         return Paths.get(_properties.get(INCORRECT_PATH));
     }
 
-    public Path getResultFilePath() {
-        return Paths.get(_properties.get(RESULT_FILE));
+    public static Path getLogFilePath() {
+        return Paths.get(_properties.get(LOG_FILE_PATH));
     }
 
-    public int getDirectoryPollingInterval() {
+    public static int getDirectoryPollingInterval() {
         return Integer.parseInt(_properties.get(DIRECTORY_POLLING_INTERVAL));
     }
 
-    public int getThreadPoolSize() {
+    public static int getThreadPoolSize() {
         return Integer.parseInt(_properties.get(THREAD_POOL_SIZE));
     }
 
-    public String getTargetFileTypeGlob() {
+    public static String getTargetFileTypeGlob() {
         return _properties.get(TARGET_FILE_TYPE_GLOB);
     }
 
-    public String getEntryName() {
+    public static String getEntryName() {
         return _properties.get(ENTRY_NAME);
     }
 
-    public String getEntryContent() {
+    public static String getEntryContent() {
         return _properties.get(ENTRY_CONTENT);
     }
 
-    public String getEntryDate() {
+    public static String getEntryDate() {
         return _properties.get(ENTRY_DATE);
     }
 

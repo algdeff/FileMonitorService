@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><configuration>
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlmonitor-configuration>
     <!--путь входящей папки для мониторинга и обработки-->
     <monitoring_path>_monitoring_folder</monitoring_path>
     <!--путь папки с корректно обработанными файлами-->
@@ -6,7 +7,7 @@
     <!--путь папки с файлами которые не удалось обработать-->
     <incorrect_files_path>_wrongFiles</incorrect_files_path>
     <!--путь и имя файла с данными завершенных операций-->
-    <result_file_path_name>result.txt</result_file_path_name>
+    <log_file_path_name>result.log</log_file_path_name>
     <!--интервал проверки директории на поступление новых файлов для обработки, сек.
     0 - постоянное отслеживание изменений-->
     <directory_polling_interval>0</directory_polling_interval>
@@ -18,4 +19,4 @@
     <entry_name>Entry</entry_name>
     <entry_content>content</entry_content>
     <entry_date>creationDate</entry_date>
-</configuration>
+</xmlmonitor-configuration>
